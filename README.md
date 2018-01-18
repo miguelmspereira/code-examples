@@ -15,10 +15,9 @@ The output of the analyses is the rank of the LD block of the best SNPs ranked a
 
 
 Data files used by this script: 
-- fulldata.csv - phenotype data which contains height and weight (used to calculate bmi in the script) and other variables which were adjusted for in the analyses.
+- fulldata.csv - phenotype and genotype data. Contains height and weight (used to calculate bmi in the script) and other variables which were adjusted for in the analyses. Also contains the dosage data for the SNPs used in this analyses.
 - priorAnswers.csv - matrix of prior knowledge. Contains the binary answers to each prior knowledge question. It is used to calculate a prior knowledge score. There are three alternatives in the script corresponding to a simple sum of the score in each question (object qSum in the code) and two others where each question has a different weight (weighted Sum). These are commented out in the current script.
-
-
+- snp6_24_ldblock.csv - Informaiton about the SNP (e.g. Chr and position) and allocation to LD blocks
 
 
 --------------------------------------------------------------------------------------------------------------------------------------
