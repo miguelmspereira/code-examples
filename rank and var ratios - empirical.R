@@ -270,6 +270,7 @@ ldblock.groupCorrespondence
 
 #---------------------------------------------------------------------------------------
 #No inclusion of prior knowledge
+#Shrinkage values to be tested
 sca<-c(100000,10000,5,2.5,1,0.5,0.1,0.01,0.001,0.0001,0.00001,0.000001) #shrinkage parameters to be tested
 
 rank.all<-cbind(sca,rep(99,times=length(sca)))
@@ -291,7 +292,6 @@ for(i in 1:length(sca)){
   prov.singleOutput<-unique(prov.orderedOutput[,2])
   
   rank<-mean(which(prov.singleOutput %in% c(17,19,24,25,28,29)))
-  #rank.sd<-std(which(prov.singleOutput %in% c(17,19,24,25,28,29)))
   rank.all[i,2]<-rank
   
   #Output with effect size and block (top 6 blocks)
@@ -308,9 +308,7 @@ for(i in 1:length(sca)){
   #Real blocks
   prov.output3<-coef(summary.bglm(mod1))[-1,1] #Estimated effects
   
-  #mean.true.fg<-mean(prov.output3[which(as.numeric(ldblock.final2[,8]) %in% c(17,19,24,25,28,29))])
   sd.true.fg<-sd(prov.output3[which(as.numeric(ldblock.final2[,8]) %in% c(17,19,24,25,28,29))])
-  #mean.false.fg<-mean(prov.output3[-which(as.numeric(ldblock.final2[,8]) %in% c(17,19,24,25,28,29))])
   sd.false.fg<-sd(prov.output3[-which(as.numeric(ldblock.final2[,8]) %in% c(17,19,24,25,28,29))])
   
   
@@ -319,18 +317,12 @@ for(i in 1:length(sca)){
   top.prov.orderedOutput<-top.prov[order(top.prov[,1]),]
   top<-unique(top.prov.orderedOutput[,2])
   
-  #mean.true.fg.top<-mean(prov.output3[which(as.numeric(ldblock.final2[,8]) %in% top[1:6])])
   sd.true.fg.top<-sd(prov.output3[which(as.numeric(ldblock.final2[,8]) %in% top[1:6])])
-  #mean.false.fg.top<-mean(prov.output3[-which(as.numeric(ldblock.final2[,8]) %in% top[1:6])])
   sd.false.fg.top<-sd(prov.output3[-which(as.numeric(ldblock.final2[,8]) %in% top[1:6])])
   
   
-  #empirical.effects<-c((sd.true.fg^2)/((sd.false.fg^2)),(sd.true.fg.top^2)/(sd.false.fg.top^2))
   empirical.effects<-rbind(empirical.effects,c((sd.true.fg^2)/((sd.false.fg^2)),(sd.true.fg.top^2)/(sd.false.fg.top^2)))
-  #colnames(empirical.effects)<-c('Variance ratio true blocks','Variance ratio top6 blocks')
   rownames(empirical.effects)[nrow(empirical.effects)]<-sca[i]
-  #rownames(empirical.effects)<-c("100000","10000")
-  
   
   #------------------------------------
   #Calculating the variance ratios centered at zero
@@ -354,13 +346,18 @@ empirical.effects0
 
 var.ratios<-cbind(empirical.effects[,2],empirical.effects[,1],empirical.effects0[,2],empirical.effects0[,1])[-1,]
 colnames(var.ratios)<-c("top.blocks","true.blocks","top.blocks at 0","true.blocks at 0")
-print.xtable(xtable(var.ratios,digits=3), type="html", file="C:/Users/mmd14/Desktop/var ratios.html")
+
+#Little table with the results
+print.xtable(xtable(var.ratios,digits=3), type="html", file="var ratios.html")
 
 
 #---------------------------------------------------------------------------------
 #Adding prior knowledge as differential shrinkage
 
-#shrinkage parameters to be tested
+#shrinkage value to be tested
+#S.min corresponds to the absence of prior knowledge
+#s.max corresponds to maximum prior knowledge
+#Other shrinkage values are interpolated linearly of exponentially in between
 s.min<-c(0.01,0.001,0.0001,0.0001,0.0001,0.0001,0.00001,0.00001,0.00001,0.00001,0.00001,0.000001,0.000001,0.000001,0.000001)
 s.max<-c(1,1,1,0.1,0.01,0.001,1,0.1,0.01,0.001,0.0001,0.1,0.01,0.001,0.0001)
 
@@ -387,14 +384,12 @@ for(i in 1:length(s.min)){
   
   prov.output<-matrix(, nrow = nrow(ldblock.final2), ncol = 0)
   prov.output<-cbind(coef(summary.bglm(mod))[-1,4],as.numeric(ldblock.final2[,8]))
-  #head(prov.output)
 
   prov.orderedOutput<-prov.output[order(prov.output[,1]),]
 
   prov.singleOutput<-unique(prov.orderedOutput[,2])
   
   rank<-mean(which(prov.singleOutput %in% c(17,19,24,25,28,29)))
-  #rank.sd<-std(which(prov.singleOutput %in% c(17,19,24,25,28,29)))
   rank.all.prior[i,3]<-rank
 
   #Output with effect size and block (top 6 blocks)
@@ -404,13 +399,13 @@ for(i in 1:length(s.min)){
   final.matrix<-cbind(new.singleOutput[1:6,1],ldblock.groupCorrespondence[new.singleOutput[1:6,3],1],new.singleOutput[1:6,4],new.singleOutput[1:6,3])
   assign((paste("final.matrix.noprior",i,sep='')),final.matrix)
 
+  
+  
   ##Variance Ratio
   #Real blocks
   prov.output3<-coef(summary.bglm(mod))[-1,1] #Estimated effects
   
-  #mean.true.fg<-mean(prov.output3[which(as.numeric(ldblock.final2[,8]) %in% c(17,19,24,25,28,29))])
   sd.true.fg<-sd(prov.output3[which(as.numeric(ldblock.final2[,8]) %in% c(17,19,24,25,28,29))])
-  #mean.false.fg<-mean(prov.output3[-which(as.numeric(ldblock.final2[,8]) %in% c(17,19,24,25,28,29))])
   sd.false.fg<-sd(prov.output3[-which(as.numeric(ldblock.final2[,8]) %in% c(17,19,24,25,28,29))])
   
   
@@ -419,14 +414,10 @@ for(i in 1:length(s.min)){
   top.prov.orderedOutput<-top.prov[order(top.prov[,1]),]
   top<-unique(top.prov.orderedOutput[,2])
   
-  #mean.true.fg.top<-mean(prov.output3[which(as.numeric(ldblock.final2[,8]) %in% top[1:6])])
   sd.true.fg.top<-sd(prov.output3[which(as.numeric(ldblock.final2[,8]) %in% top[1:6])])
-  #mean.false.fg.top<-mean(prov.output3[-which(as.numeric(ldblock.final2[,8]) %in% top[1:6])])
   sd.false.fg.top<-sd(prov.output3[-which(as.numeric(ldblock.final2[,8]) %in% top[1:6])])
   
-  #empirical.effects<-c((sd.true.fg^2)/((sd.false.fg^2)),(sd.true.fg.top^2)/(sd.false.fg.top^2))
   empirical.effects.prior<-rbind(empirical.effects.prior,c((sd.true.fg^2)/((sd.false.fg^2)),(sd.true.fg.top^2)/(sd.false.fg.top^2)))
-  #colnames(empirical.effects)<-c('Variance ratio true blocks','Variance ratio top6 blocks')
   rownames(empirical.effects.prior)[nrow(empirical.effects.prior)]<-paste(s.min[i],s.max[i],sep='-')
   
   #------------------------------------
@@ -450,18 +441,10 @@ proc.time() - ptm
 rank.all.prior
 empirical.effects.prior
 empirical.effects.prior0
-#write.csv(empirical.effects[16:24,],'c:/Users/mmd14/Dropbox/empirical effects ordered.csv')
-final.matrix6
-final.matrix10
-final.matrix14
 
-final.matrix.noprior4
-final.matrix.noprior9
-
-print.xtable(xtable(rank.all.prior,digits=3), type="html", file="C:/Users/mmd14/Dropbox/Prior Knowledge and Shrinkage/rank all prior knowledge.html")
-
+#Little table with the resutls
 var.ratios.prior<-cbind(empirical.effects.prior[,2],empirical.effects.prior[,1],empirical.effects.prior0[,2],empirical.effects.prior0[,1])[-1,]
 colnames(var.ratios.prior)<-c("top.blocks","true.blocks","top.blocks at 0","true.blocks at 0")
-print.xtable(xtable(var.ratios.prior,digits=3), type="html", file="C:/Users/mmd14/Dropbox/Prior Knowledge and Shrinkage/var ratios prior knowledge.html")
+print.xtable(xtable(var.ratios.prior,digits=3), type="html", file="var ratios prior knowledge.html")
 
 

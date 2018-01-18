@@ -3,15 +3,16 @@
 #---The standard analysis and the baysian method
 #---02Nov2017
 
-setwd('/Users/miguelmspereira/Dropbox/Thesis/Chapters/Chapter 4 - Scripts, tables and graphs/')
 library(BhGLM)
 library(data.table)
 library(ggplot2)
 
+#Working directory
+setwd('/Users/miguelmspereira/Box Sync/Congenica/scripts/')
 
 #Top 50,000 SNPs from the standard SNP analysis
 #FVC
-fvc.threshold<-read.table('/Users/miguelmspereira/Dropbox/Lung development genes/bayesian analysis/fvctop500000withLDblocks.tsv',header=T,sep='\t')
+fvc.threshold<-read.table('fvctop500000withLDblocks.tsv',header=T,sep='\t')
 head(fvc.threshold)
 dim(fvc.threshold)
 length(unique(fvc.threshold$snp))
@@ -21,7 +22,7 @@ length(unique(fvc.threshold$LD.block))
 
 #Top 50,000 SNPs from the standard SNP analysis
 #Ratio
-ratio.threshold<-read.table('/Users/miguelmspereira/Dropbox/Lung development genes/bayesian analysis/ratiotop500000withLDblocks.tsv',header=T,sep='\t')
+ratio.threshold<-read.table('ratiotop500000withLDblocks.tsv',header=T,sep='\t')
 head(ratio.threshold)
 dim(ratio.threshold)
 length(unique(ratio.threshold$snp))
@@ -46,7 +47,7 @@ dim(ratio.threshold25)
 
 ###################################################################################
 #Prior knowledge matrix
-q.fvc<-read.csv('/Users/miguelmspereira/Desktop/lungdevprior/fvc_dosages/priorknowledge_fvc.csv')
+q.fvc<-read.csv('priorknowledge_fvc.csv')
 q.final.fvc<-q.fvc[which(q.fvc$snp %in% fvc.threshold25$snp),]
 head(q.final.fvc)
 table(q.final.fvc$qSum) #Prior knowledge distribution
@@ -61,16 +62,16 @@ length(intersect(q.final.fvc$snp,q.final.ratio$snp)) #3700 SNPs intersection (18
 
 ###################################################################################
 #Results - to get the replicated SNPs
-fvc.standard<-read.csv('/Users/miguelmspereira/Dropbox/Lung development genes/new findings2/fvc standard results with eaf.csv',header=T, stringsAsFactors = F)
-fvc.bayes<-read.csv('/Users/miguelmspereira/Dropbox/Lung development genes/new findings2/fvc bayes results with eaf.csv',header=T, stringsAsFactors = F)
-ratio.standard<-read.csv('/Users/miguelmspereira/Dropbox/Lung development genes/new findings2/ratio standard results with eaf.csv',header=T, stringsAsFactors = F)
-ratio.bayes<-read.csv('/Users/miguelmspereira/Dropbox/Lung development genes/new findings2/ratio bayes results with eaf.csv',header=T, stringsAsFactors = F)
+fvc.standard<-read.csv('fvc standard results with eaf.csv',header=T, stringsAsFactors = F)
+fvc.bayes<-read.csv('fvc bayes results with eaf.csv',header=T, stringsAsFactors = F)
+ratio.standard<-read.csv('ratio standard results with eaf.csv',header=T, stringsAsFactors = F)
+ratio.bayes<-read.csv('ratio bayes results with eaf.csv',header=T, stringsAsFactors = F)
 
 
 #List of known signals - to remove the LD blocks in common
-fvc.known<-read.csv('/Users/miguelmspereira/Dropbox/Lung development genes/Known signals/fvc known signals simplified.csv',header=T,stringsAsFactors = F)
+fvc.known<-read.csv('fvc known signals.txt',header=T,stringsAsFactors = F,sep='\t')
 head(fvc.known)
-ratio.known<-read.table('/Users/miguelmspereira/Dropbox/Lung development genes/Known signals/ratio known signals correct LDblocks.txt',header=T,stringsAsFactors = F,sep='\t')
+ratio.known<-read.table('ratio known signals.txt',header=T,stringsAsFactors = F,sep='\t')
 head(ratio.known)
 
 #Remove known LD blocks - Ratio
@@ -82,7 +83,7 @@ intersect(ratio.bayes$LD.block,ratio.known$LD.Block)
 ratio.standard2<-ratio.standard[-which(ratio.standard$LD.block %in% intersect(ratio.standard$LD.block,ratio.known$LD.Block)),]
 ratio.bayes2<-ratio.bayes[-which(ratio.bayes$LD.block %in% intersect(ratio.bayes$LD.block,ratio.known$LD.Block)),]
 
-
+#Top 100 signlas for FVC and top 400 signals for FEV1/FVC - number of signals taken to replication according to the power calculations
 fvc.standard100<-fvc.standard[1:100,]
 fvc.bayes100<-fvc.bayes[1:100,]
 ratio.standard400<-ratio.standard2[1:393,]
